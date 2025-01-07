@@ -42,14 +42,14 @@ fi
 zzfound=false
 ZEDC_LIB_PATH=
 
-if [ -x "/usr/lpp/hzc/lib/libzz.a" ]; then
+if [ -r "/usr/lpp/hzc/lib/libzz.a" ]; then
      ZEDC_LIB_PATH="/usr/lpp/hzc/lib/"
      zzfound=true
 else
      OLD_IFS=\$IFS
      IFS=':'
      for p in \$ZOPEN_OLD_LIBPATH; do
-       if [ -x "\$p/libzz.a" ]; then
+       if [ -r "\$p/libzz.a" ]; then
          ZEDC_LIB_PATH=$p
          zzfound=true
          break

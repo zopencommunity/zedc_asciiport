@@ -74,6 +74,13 @@ return 0
 ZZ
 }
 
+zopen_post_install()
+{
+    cd ${ZOPEN_INSTALL_DIR}/lib
+    ln -sf libzedc_ascii.a libz.a
+    cd -
+}
+
 zopen_get_version()
 {
 	../build/tests/getVersion

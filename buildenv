@@ -60,7 +60,8 @@ fi
 
 if \${zzfound} ; then
      echo "libzz.a found at \$ZEDC_LIB_PATH"
-     export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -I\$PWD/include"
+     export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -mzos-target=zosv2r5 -march=z13 -I\$PWD/include"
+     export ZOPEN_SYSTEM_PREREQS="zos25"
      export ZOPEN_EXTRA_CXXFLAGS="\${ZOPEN_EXTRA_CXXFLAGS} -I\$PWD/include"
      export ZOPEN_EXTRA_LDFLAGS="\${ZOPEN_EXTRA_LDFLAGS} -L\$PWD/lib -L\${ZEDC_LIB_PATH}"
      export ZOPEN_EXTRA_LIBS="\${ZOPEN_EXTRA_LIBS} -lzedc_ascii -lzz"

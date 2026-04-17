@@ -1,15 +1,18 @@
+# bump: zedc_ascii-version /ZEDC_ASCII_VERSION="(.*)"/ https://github.com/zopencommunity/zedc_ascii.git|semver:*
+ZEDC_ASCII_VERSION="V.R.M"
+
 export ZOPEN_CATEGORIES="library"
-export ZOPEN_NAME="zedc_ascii"
+export ZOPEN_STABLE_TAG="v${ZEDC_ASCII_VERSION}"
 export ZOPEN_CONFIGURE="cmake"
-export ZOPEN_CONFIGURE_OPTS="-B ../build  --install-prefix \$ZOPEN_INSTALL_DIR/ -DBUILD_TESTING=ON -DENABLE_STATIC_INIT=ON -DCMAKE_INSTALL_PREFIX=\$ZOPEN_INSTALL_DIR/ -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ."
+export ZOPEN_CONFIGURE_OPTS="-B ../build -DCMAKE_INSTALL_PREFIX=\$ZOPEN_INSTALL_DIR/ ."
 export ZOPEN_MAKE="cmake"
-export ZOPEN_MAKE_OPTS=" --build ../build --parallel \$ZOPEN_NUM_JOBS --target all"
+export ZOPEN_MAKE_OPTS="--build ../build --parallel \$ZOPEN_NUM_JOBS"
 export ZOPEN_MAKE_MINIMAL="yes"
 export ZOPEN_COMP=CLANG
 
-export ZOPEN_BUILD_LINE="DEV"
-export ZOPEN_DEV_URL="https://github.com/zopencommunity/zedc_ascii.git"
-export ZOPEN_DEV_DEPS="make cmake git coreutils"
+export ZOPEN_BUILD_LINE="STABLE"
+export ZOPEN_STABLE_URL="https://github.com/zopencommunity/zedc_ascii.git"
+export ZOPEN_STABLE_DEPS="make cmake git coreutils"
 export ZOPEN_INSTALL="cmake"
 export ZOPEN_INSTALL_OPTS="--install ../build"
 
@@ -21,8 +24,8 @@ zopen_check_results()
   dir="$1"
   pfx="$2"
   chk="$1/$2_check.log"
-  totalTests=$(egrep "^Total tests:" $chk | awk '{ print $3}') 
-  failures=$(egrep "^Failed:" $chk | awk '{ print $2}')
+  totalTests=$(grep -i "^Total tests:" $chk | awk '{ print $3}') 
+  failures=$(grep -i "^Failed:" $chk | awk '{ print $2}')
   
 # Echo the following information to guage build health
 cat <<TEST
@@ -60,11 +63,10 @@ fi
 
 if \${zzfound} ; then
      echo "libzz.a found at \$ZEDC_LIB_PATH"
-     export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -mzos-target=zosv2r5 -march=z13 -I\$PWD/include"
-     export ZOPEN_SYSTEM_PREREQS="zos25"
+     export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -I\$PWD/include"
      export ZOPEN_EXTRA_CXXFLAGS="\${ZOPEN_EXTRA_CXXFLAGS} -I\$PWD/include"
      export ZOPEN_EXTRA_LDFLAGS="\${ZOPEN_EXTRA_LDFLAGS} -L\$PWD/lib -L\${ZEDC_LIB_PATH}"
-     export ZOPEN_EXTRA_LIBS="\${ZOPEN_EXTRA_LIBS} -lzedc_ascii -lzz"
+     export ZOPEN_EXTRA_LIBS="\${ZOPEN_EXTRA_LIBS} -lz -lzz"
 else
     echo "Unable to find libzz.a" >&2
     return 1
@@ -77,13 +79,13 @@ ZZ
 
 zopen_post_install()
 {
-    cd ${ZOPEN_INSTALL_DIR}/lib
-    ln -sf libzedc_ascii.a libz.a
-    cd -
+  cd ${ZOPEN_INSTALL_DIR}/lib
+  ln -sf libzedc_ascii.a libz.a
+  cd -
 }
 
 zopen_get_version()
 {
-	../build/tests/getVersion
+  ../build/tests/getVersion
 }
 

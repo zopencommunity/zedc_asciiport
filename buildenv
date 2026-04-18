@@ -1,5 +1,5 @@
 # bump: zedc_ascii-version /ZEDC_ASCII_VERSION="(.*)"/ https://github.com/zopencommunity/zedc_ascii.git|semver:*
-ZEDC_ASCII_VERSION="1.0"
+ZEDC_ASCII_VERSION="1.1"
 
 export ZOPEN_CATEGORIES="library"
 export ZOPEN_STABLE_TAG="v${ZEDC_ASCII_VERSION}"
@@ -12,7 +12,7 @@ export ZOPEN_COMP=CLANG
 
 export ZOPEN_BUILD_LINE="STABLE"
 export ZOPEN_STABLE_URL="https://github.com/zopencommunity/zedc_ascii.git"
-export ZOPEN_STABLE_DEPS="make cmake git coreutils"
+export ZOPEN_STABLE_DEPS="make cmake coreutils"
 export ZOPEN_INSTALL="cmake"
 export ZOPEN_INSTALL_OPTS="--install ../build"
 
@@ -42,30 +42,11 @@ if [ -z "\$ZOPEN_IN_ZOPEN_BUILD" ]; then
     return 0; # Do nothing
 fi
 
-zzfound=false
-ZEDC_LIB_PATH=
-
-if [ -r "/usr/lpp/hzc/lib/libzz.a" ]; then
-     ZEDC_LIB_PATH="/usr/lpp/hzc/lib/"
-     zzfound=true
-else
-     OLD_IFS=\$IFS
-     IFS=':'
-     for p in \$ZOPEN_OLD_LIBPATH; do
-       if [ -r "\$p/libzz.a" ]; then
-         ZEDC_LIB_PATH=$p
-         zzfound=true
-         break
-       fi
-     done
-     IFS=\$OLD_IFS
-fi
-
-if \${zzfound} ; then
+if [ -r "@ZEDC_LIB_PATH@" ] ; then
      echo "libzz.a found at \$ZEDC_LIB_PATH"
      export ZOPEN_EXTRA_CFLAGS="\${ZOPEN_EXTRA_CFLAGS} -I\$PWD/include"
      export ZOPEN_EXTRA_CXXFLAGS="\${ZOPEN_EXTRA_CXXFLAGS} -I\$PWD/include"
-     export ZOPEN_EXTRA_LDFLAGS="\${ZOPEN_EXTRA_LDFLAGS} -L\$PWD/lib -L\${ZEDC_LIB_PATH}"
+     export ZOPEN_EXTRA_LDFLAGS="\${ZOPEN_EXTRA_LDFLAGS} -L\$PWD/lib -L@ZEDC_LIB_PATH@"
      export ZOPEN_EXTRA_LIBS="\${ZOPEN_EXTRA_LIBS} -lz -lzz"
 else
     echo "Unable to find libzz.a" >&2
@@ -77,8 +58,46 @@ return 0
 ZZ
 }
 
+zopen_append_to_setup()
+{
+cat <<ZZ
+
+zzfound=false
+ZEDC_LIB_PATH=
+
+if [ -r "/usr/lpp/hzc/lib/libzz.a" ]; then
+     ZEDC_LIB_PATH="/usr/lpp/hzc/lib/"
+     zzfound=true
+else
+     OLD_IFS=\$IFS
+     IFS=':'
+     for p in \${LIBPATH}; do
+       if [ -r "\$p/libzz.a" ]; then
+         ZEDC_LIB_PATH=\$p
+         zzfound=true
+         break
+       fi
+     done
+     IFS=\$OLD_IFS
+fi
+
+if \${zzfound} ; then
+     echo "libzz.a found at \$ZEDC_LIB_PATH"
+     APPENV_FILE="\${ZOPEN_INSTALL_DIR}/.appenv"
+     PC_FILE="\${ZOPEN_INSTALL_DIR}/lib/pkgconfig/zlib.pc"
+     if [ -w "\$APPENV_FILE" ]; then
+         sed -i "s|@ZEDC_LIB_PATH@|\${ZEDC_LIB_PATH}|" "\$APPENV_FILE"
+     fi
+     if [ -w "\$PC_FILE" ]; then
+         sed -i "s|@ZEDC_LIB_PATH@|\${ZEDC_LIB_PATH}|" "\$PC_FILE"
+     fi
+else
+    echo "Warning: Unable to find libzz.a. zlib.pc may contain incorrect paths." >&2
+fi
+ZZ
+}
+
 zopen_get_version()
 {
   ../build/tests/getVersion
 }
-

@@ -1,5 +1,5 @@
 # bump: zedc_ascii-version /ZEDC_ASCII_VERSION="(.*)"/ https://github.com/zopencommunity/zedc_ascii.git|semver:*
-ZEDC_ASCII_VERSION="1.1"
+ZEDC_ASCII_VERSION="1.2"
 
 export ZOPEN_CATEGORIES="library"
 export ZOPEN_STABLE_TAG="v${ZEDC_ASCII_VERSION}"
